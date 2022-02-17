@@ -1,0 +1,72 @@
+查看证书信息
+keytool -list -v -alias serverkey -keystore kserver.ks -storepass sendiserverpass
+keytool -list -v -alias clientkey -keystore tserver.ks -storepass sendiserverpublicpass
+
+keytool -list -v -alias clientkey -keystore kclient.ks -storepass sendiclientpass
+keytool -list -v -alias serverkey -keystore tclient.ks -storepass sendiclientpublicpass
+
+
+首先创建服务器端私有密钥和公共密钥
+1, keytool -genkey -alias serverkey -validity 36500 -keystore kserver.ks -keysize 2048 -keyalg RSA -dname "CN=xingming,OU=danwei,O=zuzhi,L=shi,ST=sheng,C=CN" -storepass sendiserverpass
+    密码: sendiserverpass
+2, keytool -export -alias serverkey -keystore kserver.ks -file server.crt -storepass sendiserverpass
+3, keytool -import -alias serverkey -file server.crt -keystore tclient.ks -storepass sendiclientpublicpass
+    密码: sendiclientpublicpass
+
+下面创建客户器端私有密钥和公共密钥
+1, keytool -genkey -alias clientkey -validity 36500 -keystore kclient.ks -keysize 2048 -keyalg RSA -dname "CN=xingming,OU=danwei,O=zuzhi,L=shi,ST=sheng,C=CN" -storepass sendiclientpass
+    密码: sendiclientpass
+2, keytool -export -alias clientkey -keystore kclient.ks -file client.crt -storepass sendiclientpass
+3, keytool -import -alias clientkey -file client.crt -keystore tserver.ks -storepass sendiserverpublicpass
+    密码: sendiserverpublicpass
+
+keytool -genkey -alias tomcat -keyalg RSA -keystore D:/tomcat.keystore -keypass 123456 -storepass 123456 -dname "CN=xingming,OU=danwei,O=zuzhi,L=shi,ST=sheng,C=CN"
+keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 -validity 365 -keystore D:/tomcat.keystore -keypass 123456 -storepass 123456 -dname "CN=xingming,OU=danwei,O=zuzhi,L=shi,ST=sheng,C=CN"
+
+
+https://blog.csdn.net/weixin_39529785/article/details/97647017
+原因：由于不同的KEYALG 不同，keysize 也不一样，如果不加参数 -keyalg，默认就是 DSA，而DSA 的keysize 是 1024
+
+
+------------------------->>>
+
+传参说明--------->>>>
+Server(10.4.4.4)
+
+serverPort:服务端监听端口,默认7000
+token：校验密码，默认gzsendi
+ssl:是否需要ssl加密，默认为false
+
+
+Control(192.168.60.101)
+
+trunnelHost:隧道IP 如 10.4.4.4
+trunnelPort:隧道Port 7000
+token:校验密码，默认gzsendi
+groups:分组字符串，多个分组用逗号分隔如： stcp1,stcp2
+remoteHosts: 需要访问的真实IP列表，逗号分隔， 如192.168.60.121,192.168.60.133
+remotePorts: 需要访问的真实Port列表，逗号分隔 如 3306，8899
+serverFrontPorts：服务端口（提供给穿透访问使用）：如13306，18899
+
+
+可选 ---->>>
+Control(192.168.60.101)：Control需要通过代理连接到Server(10.4.4.4)时用到
+needProxy = false; //是否需要代理
+proxyType = "socks"; //代理方式 socks,http
+proxyHost = "127.0.0.1"; //代理ip
+proxyPort = 1080;        //代理端口
+proxyUsername = "sendi"; //代理账号
+proxyPassword = "sendi123"; //代理密码
+
+
+--------------------------------->>>
+
+将Server比如 10.4.4.4（外网IP） 和 Control（192.168.60.101）启动
+
+通过以下映射规则进行访问：
+
+10.4.4.4:18899  -------->  192.168.60.133:8899
+10.4.4.4:13306  -------->  192.168.60.121:3306
+
+
+
