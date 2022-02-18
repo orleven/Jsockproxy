@@ -18,7 +18,7 @@ java -cp target/jsockproxy.jar jsockproxy.server.ProxyServerApp -ssl false -serv
 ## 客户端（内网服务器）
 
 ```
-java -cp target/jsockproxy.jar jsockproxy.client.ProxyClientApp -ssl false -token gzsendi -trunnelHost VPS服务器IP -trunnelPort VPS服务器端口 -groups test -serverFrontPorts VPS服务器代理端口
+java -cp target/jsockproxy.jar jsockproxy.client.ProxyClientApp -ssl false -token 123456 -trunnelHost VPS服务器IP -trunnelPort VPS服务器端口 -groups test -serverFrontPorts VPS服务器代理端口
 ```
 
 # 备注
